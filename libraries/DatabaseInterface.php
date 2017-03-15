@@ -280,11 +280,10 @@ class DatabaseInterface
                     'SQL[' . basename($_SERVER['SCRIPT_NAME']) . ']: '
                     . sprintf('%0.3f', $time) . ' > ' . $query
                 );
-                closelog();
             }
         }
 
-        if ($result !== false && Tracker::isActive()) {
+        if ((!empty($result)) && (Tracker::isActive())) {
             Tracker::handleQuery($query);
         }
 
@@ -319,17 +318,13 @@ class DatabaseInterface
      */
     public function getTables($database, $link = null)
     {
-        $tables = $this->fetchResult(
+        return $this->fetchResult(
             'SHOW TABLES FROM ' . Util::backquote($database) . ';',
             null,
             0,
             $link,
             self::QUERY_STORE
         );
-        if ($GLOBALS['cfg']['NaturalOrder']) {
-            uksort($tables, 'strnatcasecmp');
-        }
-        return $tables;
     }
 
     /**
@@ -2071,9 +2066,9 @@ class DatabaseInterface
         $user = $this->fetchValue('SELECT CURRENT_USER();');
         if ($user !== false) {
             Util::cacheSet('mysql_cur_user', $user);
-            return $user;
+            return Util::cacheGet('mysql_cur_user');
         }
-        return '@';
+        return '';
     }
 
     /**
@@ -2278,7 +2273,7 @@ class DatabaseInterface
             // Share the settings if the host is same
             if ($server['host'] == $cfg['Server']['host']) {
                 $shared = array(
-                    'port', 'socket', 'compress',
+                    'port', 'socket', 'connect_type', 'compress',
                     'ssl', 'ssl_key', 'ssl_cert', 'ssl_ca',
                     'ssl_ca_path',  'ssl_ciphers', 'ssl_verify',
                 );

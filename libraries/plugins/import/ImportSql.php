@@ -15,6 +15,7 @@ use PMA\libraries\properties\options\groups\OptionsPropertyRootGroup;
 use PMA;
 use PMA\libraries\plugins\ImportPlugin;
 use PMA\libraries\properties\options\items\SelectPropertyItem;
+use SqlParser;
 
 /**
  * Handles the import for the SQL format
@@ -110,7 +111,7 @@ class ImportSql extends ImportPlugin
         // Handle compatibility options.
         $this->_setSQLMode($GLOBALS['dbi'], $_REQUEST);
 
-        $bq = new \PhpMyAdmin\SqlParser\Utils\BufferedQuery();
+        $bq = new SqlParser\Utils\BufferedQuery();
         if (isset($_POST['sql_delimiter'])) {
             $bq->setDelimiter($_POST['sql_delimiter']);
         }

@@ -1226,7 +1226,7 @@ class ExportSqlTest extends PMATestCase
         );
 
         $this->assertContains(
-            "-- RELATIONSHIPS FOR TABLE :\n" .
+            "-- RELATIONS FOR TABLE :\n" .
             "--   foo\n" .
             "--       ftable -> ffield",
             $result

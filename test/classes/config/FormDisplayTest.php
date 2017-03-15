@@ -224,7 +224,7 @@ class FormDisplayTest extends PMATestCase
         );
 
         $sysArr = array(
-            "Servers/1/test" => "Servers/1/host"
+            "Servers/1/test" => "Servers/1/connect_type"
         );
 
         $attrSystemPaths = $reflection->getProperty('_systemPaths');
@@ -239,7 +239,7 @@ class FormDisplayTest extends PMATestCase
             array(
                 'Servers' => array(
                     '1' => array(
-                        'test' => 'localhost'
+                        'test' => 'tcp'
                     )
                 )
             ),

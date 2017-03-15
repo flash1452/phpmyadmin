@@ -64,7 +64,6 @@ var ErrorReport = {
             $('#error_report_dialog').remove();
         }
         var $div = $('<div id="error_report_dialog"></div>');
-        $div.css('z-index', '1000');
 
         var button_options = {};
 
@@ -304,8 +303,8 @@ var ErrorReport = {
 
 };
 
-AJAX.registerOnload('error_report.js', function(){
-    TraceKit.report.subscribe(ErrorReport.error_handler);
-    ErrorReport.set_up_error_reporting();
+TraceKit.report.subscribe(ErrorReport.error_handler);
+ErrorReport.set_up_error_reporting();
+$(function () {
     ErrorReport.wrap_global_functions();
 });

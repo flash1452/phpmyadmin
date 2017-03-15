@@ -95,7 +95,6 @@ $post_params = array(
         'ods_columns',
         'json_structure_or_data',
         'json_pretty_print',
-        'json_unicode',
         'xml_structure_or_data',
         'xml_export_events',
         'xml_export_functions',
@@ -186,6 +185,9 @@ $export_plugin = PMA_getPlugin(
         'single_table' => isset($single_table)
     )
 );
+
+// Backward compatibility
+$type = $what;
 
 // Check export type
 if (empty($export_plugin)) {
@@ -278,12 +280,12 @@ if ($export_type == 'server') {
 // Merge SQL Query aliases with Export aliases from
 // export page, Export page aliases are given more
 // preference over SQL Query aliases.
-$parser = new \PhpMyAdmin\SqlParser\Parser($sql_query);
+$parser = new SqlParser\Parser($sql_query);
 $aliases = array();
 if ((!empty($parser->statements[0]))
-    && ($parser->statements[0] instanceof \PhpMyAdmin\SqlParser\Statements\SelectStatement)
+    && ($parser->statements[0] instanceof SqlParser\Statements\SelectStatement)
 ) {
-    $aliases = \PhpMyAdmin\SqlParser\Utils\Misc::getAliases($parser->statements[0], $db);
+    $aliases = SqlParser\Utils\Misc::getAliases($parser->statements[0], $db);
 }
 if (!empty($_REQUEST['aliases'])) {
     $aliases = PMA_mergeAliases($aliases, $_REQUEST['aliases']);
@@ -313,15 +315,16 @@ $time_start = time();
 if ($what == 'sql') {
     $crlf = "\n";
 } else {
-    $crlf = PHP_EOL;
+    $crlf = PMA\libraries\Util::whichCrlf();
 }
 
-$output_kanji_conversion = Encoding::canConvertKanji();
+$output_kanji_conversion = Encoding::canConvertKanji() && $type != 'xls';
 
 // Do we need to convert charset?
 $output_charset_conversion = $asfile
     && Encoding::isSupported()
-    && isset($charset) && $charset != 'utf-8';
+    && isset($charset) && $charset != 'utf-8'
+    && $type != 'xls';
 
 // Use on the fly compression?
 $GLOBALS['onfly_compression'] = $GLOBALS['cfg']['CompressOnFly']

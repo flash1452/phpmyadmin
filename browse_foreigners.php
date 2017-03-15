@@ -37,7 +37,8 @@ $header->setBodyId('body_browse_foreigners');
  * Displays the frame
  */
 
-$foreigners  = PMA_getForeigners($db, $table);
+$cfgRelation = PMA_getRelationsParam();
+$foreigners  = ($cfgRelation['relwork'] ? PMA_getForeigners($db, $table) : false);
 $foreign_limit = PMA_getForeignLimit(
     isset($_REQUEST['foreign_showAll']) ? $_REQUEST['foreign_showAll'] : null
 );

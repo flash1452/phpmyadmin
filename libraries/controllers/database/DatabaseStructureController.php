@@ -754,9 +754,9 @@ class DatabaseStructureController extends DatabaseController
         if (isset($current_table['TABLE_ROWS'])
             && ($current_table['ENGINE'] != null || $table_is_view)
         ) {
-            // InnoDB/TokuDB table: we did not get an accurate row count
+            // InnoDB table: we did not get an accurate row count
             $approx_rows = !$table_is_view
-                && in_array($current_table['ENGINE'], array('InnoDB', 'TokuDB'))
+                && $current_table['ENGINE'] == 'InnoDB'
                 && !$current_table['COUNTED'];
 
             if ($table_is_view
@@ -904,7 +904,7 @@ class DatabaseStructureController extends DatabaseController
             if ($this->db == PMA_extractDbOrTable($db_table)
                 && preg_match(
                     "@^" .
-                    preg_quote(mb_substr(PMA_extractDbOrTable($db_table, 'table'), 0, -1)) . "@",
+                    mb_substr(PMA_extractDbOrTable($db_table, 'table'), 0, -1) . "@",
                     $truename
                 )
             ) {
@@ -943,6 +943,7 @@ class DatabaseStructureController extends DatabaseController
         case 'ARCHIVE' :
         case 'Aria' :
         case 'Maria' :
+        case 'TokuDB' :
             list($current_table, $formatted_size, $unit, $formatted_overhead,
                 $overhead_unit, $overhead_size, $sum_size)
                     = $this->getValuesForAriaTable(
@@ -952,7 +953,6 @@ class DatabaseStructureController extends DatabaseController
             break;
         case 'InnoDB' :
         case 'PBMS' :
-        case 'TokuDB' :
             // InnoDB table: Row count is not accurate but data and index sizes are.
             // PBMS table in Drizzle: TABLE_ROWS is taken from table cache,
             // so it may be unavailable
@@ -1036,9 +1036,11 @@ class DatabaseStructureController extends DatabaseController
             if (isset($current_table['Data_free'])
                 && $current_table['Data_free'] > 0
             ) {
+                // here, the value 4 as the second parameter
+                // would transform 6.1MiB into 6,224.6KiB
                 list($formatted_overhead, $overhead_unit)
                     = Util::formatByteDown(
-                        $current_table['Data_free'], 3,
+                        $current_table['Data_free'], 4,
                         (($current_table['Data_free'] > 0) ? 1 : 0)
                     );
                 $overhead_size += $current_table['Data_free'];
@@ -1062,7 +1064,7 @@ class DatabaseStructureController extends DatabaseController
     ) {
         $formatted_size = $unit = '';
 
-        if ((in_array($current_table['ENGINE'], array('InnoDB', 'TokuDB'))
+        if (($current_table['ENGINE'] == 'InnoDB'
             && $current_table['TABLE_ROWS'] < $GLOBALS['cfg']['MaxExactCount'])
             || !isset($current_table['TABLE_ROWS'])
         ) {

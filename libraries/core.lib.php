@@ -741,7 +741,6 @@ function PMA_isAllowedDomain($url)
         'mariadb.org', 'mariadb.com',
         /* php.net domains */
         'php.net',
-        'secure.php.net',
         /* sourceforge.net domain */
         'sourceforge.net',
         /* Github domains*/
@@ -874,10 +873,6 @@ function PMA_cleanupPathInfo()
     }
     $_PATH_INFO = PMA_getenv('PATH_INFO');
     if (! empty($_PATH_INFO) && ! empty($PMA_PHP_SELF)) {
-        $question_pos = mb_strpos($PMA_PHP_SELF, '?');
-        if ($question_pos != false) {
-            $PMA_PHP_SELF = mb_substr($PMA_PHP_SELF, 0, $question_pos);
-        }
         $path_info_pos = mb_strrpos($PMA_PHP_SELF, $_PATH_INFO);
         if ($path_info_pos !== false) {
             $path_info_part = mb_substr($PMA_PHP_SELF, $path_info_pos, mb_strlen($_PATH_INFO));
@@ -886,24 +881,7 @@ function PMA_cleanupPathInfo()
             }
         }
     }
-
-    $path = [];
-    foreach(explode('/', $PMA_PHP_SELF) as $part) {
-        // ignore parts that have no value
-        if (empty($part) || $part === '.') continue;
-
-        if ($part !== '..') {
-            // cool, we found a new part
-            array_push($path, $part);
-        } else if (count($path) > 0) {
-            // going back up? sure
-            array_pop($path);
-        }
-        // Here we intentionall ignore case where we go too up
-        // as there is nothing sane to do
-    }
-
-    $PMA_PHP_SELF = htmlspecialchars('/' . join('/', $path));
+    $PMA_PHP_SELF = htmlspecialchars($PMA_PHP_SELF);
 }
 
 /**

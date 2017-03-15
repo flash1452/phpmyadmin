@@ -199,7 +199,6 @@ function PMA_getHtmlForActivateDeactivateTracking(
 ) {
     $html = '<div>';
     $html .= '<form method="post" action="tbl_tracking.php' . $url_query . '">';
-    $html .= URL::getHiddenInputs($GLOBALS['db'], $GLOBALS['table']);
     $html .= '<fieldset>';
     $html .= '<legend>';
 
@@ -421,7 +420,6 @@ function PMA_getSQLResultForSelectableTables()
 function PMA_getHtmlForSelectableTables($selectable_tables_sql_result, $url_query)
 {
     $html = '<form method="post" action="tbl_tracking.php' . $url_query . '">';
-    $html .= URL::getHiddenInputs($GLOBALS['db'], $GLOBALS['table']);
     $html .= '<select name="table" class="autosubmit">';
     while ($entries = $GLOBALS['dbi']->fetchArray($selectable_tables_sql_result)) {
         if (Tracker::isTracked($entries['db_name'], $entries['table_name'])) {
@@ -579,7 +577,6 @@ function PMA_getHtmlForTrackingReportExportForm1(
             )
         )
         . '">';
-    $html .= URL::getHiddenInputs();
 
     $html .= sprintf(
         __('Show %1$s with dates from %2$s to %3$s by user %4$s %5$s'),
@@ -630,7 +627,6 @@ function PMA_getHtmlForTrackingReportExportForm2(
             )
         )
         . '">';
-    $html .= URL::getHiddenInputs();
     $html .= sprintf(
         __('Show %1$s with dates from %2$s to %3$s by user %4$s %5$s'),
         $str1, $str2, $str3, $str4, $str5
@@ -643,7 +639,6 @@ function PMA_getHtmlForTrackingReportExportForm2(
             + array('report' => 'true', 'version' => $_REQUEST['version'])
         )
         . '">';
-    $html .= URL::getHiddenInputs();
     $html .= '<input type="hidden" name="logtype" value="'
         . htmlspecialchars($_REQUEST['logtype']) . '" />';
     $html .= '<input type="hidden" name="date_from" value="'

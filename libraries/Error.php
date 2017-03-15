@@ -130,7 +130,7 @@ class Error extends Message
 
             /* Make path relative */
             if (isset($step['file'])) {
-                $result[$idx]['file'] = self::relPath($step['file']);
+                $result[$idx]['file'] = Error::relPath($step['file']);
             }
 
             /* Store members we want */
@@ -143,7 +143,7 @@ class Error extends Message
             /* Store simplified args */
             if (isset($step['args'])) {
                 foreach ($step['args'] as $key => $arg) {
-                    $result[$idx]['args'][$key] = self::getArg($arg, $step['function']);
+                    $result[$idx]['args'][$key] = Error::getArg($arg, $step['function']);
                 }
             }
         }
@@ -174,7 +174,7 @@ class Error extends Message
      */
     public function setBacktrace($backtrace)
     {
-        $this->backtrace = self::processBacktrace($backtrace);
+        $this->backtrace = Error::processBacktrace($backtrace);
     }
 
     /**
@@ -198,7 +198,7 @@ class Error extends Message
      */
     public function setFile($file)
     {
-        $this->file = self::relPath($file);
+        $this->file = Error::relPath($file);
     }
 
 
@@ -271,7 +271,7 @@ class Error extends Message
      */
     public function getType()
     {
-        return self::$errortype[$this->getNumber()];
+        return Error::$errortype[$this->getNumber()];
     }
 
     /**
@@ -281,7 +281,7 @@ class Error extends Message
      */
     public function getLevel()
     {
-        return self::$errorlevel[$this->getNumber()];
+        return Error::$errorlevel[$this->getNumber()];
     }
 
     /**
@@ -313,7 +313,7 @@ class Error extends Message
      */
     public function getBacktraceDisplay()
     {
-        return self::formatBacktrace(
+        return Error::formatBacktrace(
             $this->getBacktrace(),
             "<br />\n",
             "<br />\n"
@@ -335,13 +335,13 @@ class Error extends Message
 
         foreach ($backtrace as $step) {
             if (isset($step['file']) && isset($step['line'])) {
-                $retval .= self::relPath($step['file'])
+                $retval .= Error::relPath($step['file'])
                     . '#' . $step['line'] . ': ';
             }
             if (isset($step['class'])) {
                 $retval .= $step['class'] . $step['type'];
             }
-            $retval .= self::getFunctionCall($step, $separator);
+            $retval .= Error::getFunctionCall($step, $separator);
             $retval .= $lines;
         }
 
@@ -407,7 +407,7 @@ class Error extends Message
         );
 
         if (in_array($function, $include_functions)) {
-            $retval .= self::relPath($arg);
+            $retval .= Error::relPath($arg);
         } elseif (in_array($function, $connect_functions)
             && getType($arg) === 'string'
         ) {

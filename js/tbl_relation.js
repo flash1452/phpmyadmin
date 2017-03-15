@@ -101,8 +101,7 @@ function getDropdownValues($dropdown) {
                     ) {
                         primary = data.primary[0];
                     }
-                    setDropdownValues($columnDd.first(), data.columns, primary);
-                    setDropdownValues($columnDd.slice(1), data.columns);
+                    setDropdownValues($columnDd, data.columns, primary);
                 }
             } else {
                 PMA_ajaxShowMessage(data.error, false);

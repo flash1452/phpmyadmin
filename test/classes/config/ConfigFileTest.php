@@ -498,6 +498,7 @@ class ConfigFileTest extends PMATestCase
                     1 => array(
                         "auth_type" => "config",
                         "user" => "testUser",
+                        "connect_type" => "tcp",
                         "host" => "example.com",
                         "port" => "21"
                     )
@@ -515,7 +516,8 @@ class ConfigFileTest extends PMATestCase
                     1 => array(
                         "auth_type" => "config",
                         "user" => "testUser",
-                        "host" => "localhost",
+                        "connect_type" => "socket",
+                        "host" => "example.com",
                         "port" => "21",
                         "socket" => "123",
                         "password" => "",
@@ -534,6 +536,7 @@ class ConfigFileTest extends PMATestCase
                     1 => array(
                         "auth_type" => "config",
                         "user" => "testUser",
+                        "connect_type" => "tcp",
                         "host" => "example.com",
                         "port" => "21",
                         "password" => "testPass"
@@ -571,6 +574,17 @@ class ConfigFileTest extends PMATestCase
             'testData',
             $this->object->getServerName(1)
         );
+    }
+
+    /**
+     * Test for ConfigFile::getFilePath
+     *
+     * @return void
+     * @test
+     */
+    public function testGetFilePath()
+    {
+        $this->assertNotEmpty($this->object->getFilePath());
     }
 
     /**

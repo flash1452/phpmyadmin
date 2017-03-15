@@ -8,11 +8,11 @@
 namespace PMA\libraries;
 
 use PMA\libraries\plugins\export\ExportSql;
-use PhpMyAdmin\SqlParser\Components\Expression;
-use PhpMyAdmin\SqlParser\Components\OptionsArray;
-use PhpMyAdmin\SqlParser\Context;
-use PhpMyAdmin\SqlParser\Parser;
-use PhpMyAdmin\SqlParser\Statements\DropStatement;
+use SqlParser\Components\Expression;
+use SqlParser\Components\OptionsArray;
+use SqlParser\Context;
+use SqlParser\Parser;
+use SqlParser\Statements\DropStatement;
 
 /**
  * Handles everything related to tables
@@ -91,7 +91,8 @@ class Table
      *
      * @see Table::getName()
      * @return string  table name
-     */
+    */
+
     public function __toString()
     {
         return $this->getName();
@@ -172,7 +173,9 @@ class Table
      */
     public function isEngine($engine)
     {
-        $tbl_storage_engine = $this->getStorageEngine();
+        $tbl_storage_engine = strtoupper(
+            $this->getStatusInfo('ENGINE', null, true)
+        );
 
         if (is_array($engine)){
             foreach($engine as $e){
@@ -319,89 +322,90 @@ class Table
     }
 
     /**
-     * Returns the Table storage Engine for current table.
-     *
-     * @return   string               Return storage engine info if it is set for
-     *                                the selected table else return blank.
-     */
-    public function getStorageEngine() {
+    * Returns the Table storage Engine for current table.
+    * @param  array $showtable       Current table properties.
+    *
+    * @return   string               Return storage engine info if it is set for *                                the selected table else return blank.
+    */
+    public function getTableStorageEngine() {
         $table_storage_engine = $this->getStatusInfo('ENGINE', false, true);
         if ($table_storage_engine === false) {
-            return '';
+            return isset($table_storage_engine)? mb_strtoupper($table_storage_engine): '';
         }
-        return strtoupper($table_storage_engine);
     }
 
     /**
-     * Returns the comments for current table.
-     *
-     * @return string Return comment info if it is set for the selected table or return blank.
-     */
-    public function getComment() {
+    * Returns the comments for current table.
+    * @param  array $showtable  Current table properties.
+    *
+    * @return string  Return comment info if it is set for the selected table or return blank.
+    */
+    public function getShowComment() {
         $table_comment = $this->getStatusInfo('COMMENT', false, true);
         if ($table_comment === false) {
-            return '';
+            return isset($table_comment) ? $table_comment : '';
         }
-        return $table_comment;
     }
 
     /**
-     * Returns the collation for current table.
-     *
-     * @return string Return blank if collation is empty else return the collation info from table info.
-     */
-    public function getCollation() {
+    * Returns the collation for current table.
+    * @param Current table properties.
+    * @return Return blank if collation is empty else return the collation info from table info.
+    */
+    public function getTableCollation() {
         $table_collation = $this->getStatusInfo('COLLATION', false, true);
         if ($table_collation === false) {
-            return '';
+            return empty($table_collation) ? '' : $table_collation;
         }
-        return $table_collation;
     }
 
     /**
-     * Returns the info about no of rows for current table.
-     *
-     * @return integer Return no of rows info if it is not null for the selected table or return 0.
-     */
-    public function getNumRows() {
+    * Returns the info about no of rows for current table.
+    * @param Current table properties.
+    * @return Return no of rows info if it is not null for the selected table or return 0.
+    */
+    public function getTableNumRowInfo() {
         $table_num_row_info = $this->getStatusInfo('TABLE_ROWS', false, true);
-        if (false === $table_num_row_info) {
-            $table_num_row_info = $this->_dbi->getTable($this->_db_name, $showtable['Name'])
+        if (null === $table_num_row_info) {
+            $table_num_row_info   = $this->_dbi
+            ->getTable($this->_db_name, $showtable['Name'])
             ->countRecords(true);
         }
-        return $table_num_row_info ? $table_num_row_info : 0 ;
+        return isset($table_num_row_info) ? $table_num_row_info : 0 ;
     }
 
     /**
-     * Returns the Row format for current table.
-     *
-     * @return string Return table row format info if it is set for the selected table or return blank.
-     */
-    public function getRowFormat() {
+    * Returns the Row format for current table.
+    * @param Current table properties.
+    * @return Return table row format info if it is set for the selected table or return blank.
+    */
+    public function getTableRowFormat() {
         $table_row_format = $this->getStatusInfo('ROW_FORMAT', false, true);
-        if ($table_row_format === false) {
-            return '';
-        }
-        return $table_row_format;
+        return isset($table_row_format)
+        ? $table_row_format
+        : '';
     }
 
     /**
-     * Returns the auto increment option for current table.
-     *
-     * @return integer Return auto increment info if it is set for the selected table or return blank.
-     */
-    public function getAutoIncrement() {
+    * Returns the auto increment option for current table.
+    * @param Current table properties.
+    * @return Return auto increment info if it is set for the selected table or return blank.
+    */
+    public function getAutoIncrementInfo() {
         $table_auto_increment = $this->getStatusInfo('AUTO_INCREMENT', false, true);
         return isset($table_auto_increment) ? $table_auto_increment : '';
     }
 
     /**
-     * Returns the array for CREATE statement for current table.
-     * @return array Return options array info if it is set for the selected table or return blank.
-     */
-    public function getCreateOptions() {
+    * Returns the array for CREATE statement for current table.
+    * @param Current table properties.
+    * @return Return options array info if it is set for the selected table or return blank.
+    */
+    public function createOptionsArray() {
         $table_options = $this->getStatusInfo('CREATE_OPTIONS', false, true);
-        $create_options_tmp = empty($table_options) ? array() : explode(' ', $table_options);
+        $create_options_tmp = isset($table_options)
+        ? explode(' ', $table_options)
+        : array();
         $create_options = array();
         // export create options by its name as variables into global namespace
         // f.e. pack_keys=1 becomes available as $pack_keys with value of '1'
@@ -417,6 +421,7 @@ class Table
         $create_options['pack_keys'] = (! isset($create_options['pack_keys']) || strlen($create_options['pack_keys']) == 0)
             ? 'DEFAULT'
             : $create_options['pack_keys'];
+        unset($create_options_tmp, $each_create_option);
         return $create_options;
     }
 
@@ -1005,7 +1010,7 @@ class Table
 
                 /**
                  * The CREATE statement of this structure.
-                 * @var \PhpMyAdmin\SqlParser\Statements\CreateStatement $statement
+                 * @var \SqlParser\Statements\CreateStatement $statement
                  */
                 $statement = $parser->statements[0];
 
@@ -1032,7 +1037,7 @@ class Table
 
                 /**
                  * The ALTER statement that generates the constraints.
-                 * @var \PhpMyAdmin\SqlParser\Statements\AlterStatement $statement
+                 * @var \SqlParser\Statements\AlterStatement $statement
                  */
                 $statement = $parser->statements[0];
 
@@ -1071,7 +1076,7 @@ class Table
                 $GLOBALS['sql_indexes'] = '';
                 /**
                  * The ALTER statement that generates the indexes.
-                 * @var \PhpMyAdmin\SqlParser\Statements\AlterStatement $statement
+                 * @var \SqlParser\Statements\AlterStatement $statement
                  */
                 foreach ($parser->statements as $statement) {
 
@@ -1113,7 +1118,7 @@ class Table
 
                     /**
                      * The ALTER statement that alters the AUTO_INCREMENT value.
-                     * @var \PhpMyAdmin\SqlParser\Statements\AlterStatement $statement
+                     * @var \SqlParser\Statements\AlterStatement $statement
                      */
                     $statement = $parser->statements[0];
 
@@ -1224,11 +1229,12 @@ class Table
                     . ') ' . ' VALUES(' . '\'' . $GLOBALS['dbi']->escapeString($target_db)
                     . '\',\'' . $GLOBALS['dbi']->escapeString($target_table) . '\',\''
                     . $GLOBALS['dbi']->escapeString($comments_copy_row['column_name'])
-                    . '\',\'' . $GLOBALS['dbi']->escapeString($target_table) . '\',\''
-                    . $GLOBALS['dbi']->escapeString($comments_copy_row['comment'])
                     . '\''
                     . ($GLOBALS['cfgRelation']['mimework']
                         ? ',\'' . $GLOBALS['dbi']->escapeString(
+                            $comments_copy_row['comment']
+                        )
+                        . '\',' . '\'' . $GLOBALS['dbi']->escapeString(
                             $comments_copy_row['mimetype']
                         )
                         . '\',' . '\'' . $GLOBALS['dbi']->escapeString(
@@ -1407,7 +1413,15 @@ class Table
      */
     public function rename($new_name, $new_db = null)
     {
-        if ($GLOBALS['dbi']->getLowerCaseNames() === '1') {
+        $lowerCaseTableNames = Util::cacheGet(
+            'lower_case_table_names',
+            function () {
+                return $GLOBALS['dbi']->fetchValue(
+                    "SELECT @@lower_case_table_names"
+                );
+            }
+        );
+        if ($lowerCaseTableNames) {
             $new_name = strtolower($new_name);
         }
 
@@ -2082,13 +2096,10 @@ class Table
         }
 
         // specifying index type is allowed only for primary, unique and index only
-        // TokuDB is using Fractal Tree, Using Type is not useless
-        // Ref: https://mariadb.com/kb/en/mariadb/storage-engine-index-types/
         $type = $index->getType();
         if ($index->getChoice() != 'SPATIAL'
             && $index->getChoice() != 'FULLTEXT'
             && in_array($type, Index::getIndexTypes())
-            && ! $this->isEngine(array('TOKUDB'))
         ) {
             $sql_query .= ' USING ' . $type;
         }
@@ -2534,10 +2545,10 @@ class Table
 
         $parser = new Parser($createTable);
         /**
-         * @var \PhpMyAdmin\SqlParser\Statements\CreateStatement $stmt
+         * @var \SqlParser\Statements\CreateStatement $stmt
         */
         $stmt = $parser->statements[0];
-        $fields = \PhpMyAdmin\SqlParser\Utils\Table::getFields($stmt);
+        $fields = \SqlParser\Utils\Table::getFields($stmt);
         if ($column != null) {
             $expression = isset($fields[$column]['expr']) ?
                 substr($fields[$column]['expr'], 1, -1) : '';

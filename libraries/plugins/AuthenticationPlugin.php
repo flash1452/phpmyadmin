@@ -145,23 +145,17 @@ abstract class AuthenticationPlugin
      *
      * @return void
      */
-    public function setSessionAccessTime()
-    {
-        if (isset($_REQUEST['guid'])) {
-            $guid = (string)$_REQUEST['guid'];
-        } else {
-            $guid = 'default';
-        }
+     public function setSessionAccessTime()
+     {
         if (isset($_REQUEST['access_time'])) {
             // Ensure access_time is in range <0, LoginCookieValidity + 1>
             // to avoid excessive extension of validity.
             //
             // Negative values can cause session expiry extension
             // Too big values can cause overflow and lead to same
-            $time = time() - min(max(0, intval($_REQUEST['access_time'])), $GLOBALS['cfg']['LoginCookieValidity'] + 1);
+            $_SESSION['last_access_time'] = time() - min(max(0, intval($_REQUEST['access_time'])), $GLOBALS['cfg']['LoginCookieValidity'] + 1);
         } else {
-            $time = time();
+            $_SESSION['last_access_time'] = time();
         }
-        $_SESSION['browser_access_time'][$guid] = $time;
      }
 }
