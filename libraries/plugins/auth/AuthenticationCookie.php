@@ -153,15 +153,13 @@ class AuthenticationCookie extends AuthenticationPlugin
         )->display();
         echo "</noscript>\n";
 
+        echo "<div class='hide js-show'>";
         // Displays the languages form
-        $language_manager = LanguageManager::getInstance();
-        if (empty($GLOBALS['cfg']['Lang']) && $language_manager->hasChoice()) {
-            echo "<div class='hide js-show'>";
+        if (empty($GLOBALS['cfg']['Lang'])) {
             // use fieldset, don't show doc link
-            echo $language_manager->getSelectorDisplay(true, false);
-            echo '</div>';
+            echo LanguageManager::getInstance()->getSelectorDisplay(true, false);
         }
-        echo '
+        echo '</div>
     <br />
     <!-- Login form -->
     <form method="post" action="index.php" name="login_form"' , $autocomplete ,
@@ -228,8 +226,7 @@ class AuthenticationCookie extends AuthenticationPlugin
             echo '<script src="https://www.google.com/recaptcha/api.js?hl='
                 , $GLOBALS['lang'] , '" async defer></script>';
             echo '<div class="g-recaptcha" data-sitekey="'
-                , htmlspecialchars($GLOBALS['cfg']['CaptchaLoginPublicKey']) ,
-                '" data-callback="loginButtonEnable" data-expired-callback="loginButtonDisable" captcha="enabled"></div>';
+                , htmlspecialchars($GLOBALS['cfg']['CaptchaLoginPublicKey']) , '"></div>';
         }
 
         echo '</fieldset>
@@ -380,19 +377,13 @@ class AuthenticationCookie extends AuthenticationPlugin
         );
 
         // user was never logged in since session start
-        if (empty($_SESSION['browser_access_time'])) {
+        if (empty($_SESSION['last_access_time'])) {
             return false;
         }
 
         // User inactive too long
         $last_access_time = time() - $GLOBALS['cfg']['LoginCookieValidity'];
-        foreach ($_SESSION['browser_access_time'] as $key => $value) {
-            if ($value < $last_access_time) {
-                unset($_SESSION['browser_access_time'][$key]);
-            }
-        }
-        // All sessions expired
-        if (empty($_SESSION['browser_access_time'])) {
+        if ($_SESSION['last_access_time'] < $last_access_time) {
             Util::cacheUnset('is_create_db_priv');
             Util::cacheUnset('is_reload_priv');
             Util::cacheUnset('db_to_create');
@@ -455,6 +446,7 @@ class AuthenticationCookie extends AuthenticationPlugin
                     && $current['port'] == $cfg['Server']['port']
                     && $current['socket'] == $cfg['Server']['socket']
                     && $current['ssl'] == $cfg['Server']['ssl']
+                    && $current['connect_type'] == $cfg['Server']['connect_type']
                     && hash_equals($current['user'], $GLOBALS['PHP_AUTH_USER'])
                 ) {
                     $GLOBALS['server'] = $idx;
@@ -720,23 +712,14 @@ class AuthenticationCookie extends AuthenticationPlugin
     }
 
     /**
-     * Cleans any SSL errors
-     *
-     * This can happen from corrupted cookies, by invalid encryption
-     * parameters used in older phpMyAdmin versions or by wrong openSSL
-     * configuration.
-     *
-     * In neither case the error is useful to user, but we need to clear
-     * the error buffer as otherwise the errors would pop up later, for
-     * example during MySQL SSL setup.
+     * Reports any SSL errors
      *
      * @return void
      */
-    public function cleanSSLErrors()
+    public function reportSSLErrors()
     {
-        if (function_exists('openssl_error_string')) {
-            while (($ssl_err = openssl_error_string()) !== false) {
-            }
+        while (($ssl_err = openssl_error_string()) !== false) {
+            trigger_error('OpenSSL error: ' . $ssl_err, E_USER_ERROR);
         }
     }
 
@@ -762,13 +745,13 @@ class AuthenticationCookie extends AuthenticationPlugin
                 0,
                 $iv
             );
+            $this->reportSSLErrors();
         } else {
             $cipher = new Crypt\AES(Crypt\Base::MODE_CBC);
             $cipher->setIV($iv);
             $cipher->setKey($aes_secret);
             $result = base64_encode($cipher->encrypt($data));
         }
-        $this->cleanSSLErrors();
         $iv = base64_encode($iv);
         return json_encode(
             array(
@@ -814,14 +797,14 @@ class AuthenticationCookie extends AuthenticationPlugin
                 0,
                 base64_decode($data['iv'])
             );
+            $this->reportSSLErrors();
+            return $result;
         } else {
             $cipher = new Crypt\AES(Crypt\Base::MODE_CBC);
             $cipher->setIV(base64_decode($data['iv']));
             $cipher->setKey($aes_secret);
-            $result = $cipher->decrypt(base64_decode($data['payload']));
+            return $cipher->decrypt(base64_decode($data['payload']));
         }
-        $this->cleanSSLErrors();
-        return $result;
     }
 
     /**

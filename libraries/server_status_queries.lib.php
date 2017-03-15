@@ -134,12 +134,14 @@ function PMA_getHtmlForServerStatusQueriesDetails($ServerStatusData)
     $retval .= '</tbody>';
     $retval .= '</table>';
 
-    $retval .= '<div id="serverstatusquerieschart" data-chart="';
+    $retval .= '<div id="serverstatusquerieschart"></div>';
+    $retval .= '<div id="serverstatusquerieschart_data" style="display:none;">';
     if ($other_sum > 0) {
         $chart_json[__('Other')] = $other_sum;
     }
-    $retval .= htmlspecialchars(json_encode($chart_json), ENT_QUOTES);
-    $retval .= '"></div>';
+    $retval .= htmlspecialchars(json_encode($chart_json));
+    $retval .= '</div>';
 
     return $retval;
 }
+

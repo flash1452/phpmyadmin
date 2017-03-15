@@ -715,16 +715,6 @@ class LanguageManager
     }
 
     /**
-     * Checks whether there are some languages available
-     *
-     * @return boolean
-     */
-    public function hasChoice()
-    {
-        return count($this->availableLanguages()) > 1;
-    }
-
-    /**
      * Returns (cached) list of all available languages
      *
      * @return array of Language objects

@@ -523,7 +523,6 @@ $(function () {
         $.ajax({
             type: 'POST',
             data: {
-                server: PMA_commonParams.get('server'),
                 token: PMA_commonParams.get('token')
             },
             url: $(this).attr('href') + '&ajax_request=true',
@@ -575,7 +574,6 @@ $(function () {
         $.ajax({
             type: 'POST',
             data: {
-                server: PMA_commonParams.get('server'),
                 token: PMA_commonParams.get('token')
             },
             url: $(this).attr('href') + '&ajax_request=true',
@@ -612,7 +610,6 @@ $(function () {
                 favorite_tables: (isStorageSupported('localStorage') && typeof window.localStorage.favorite_tables !== 'undefined')
                     ? window.localStorage.favorite_tables
                     : '',
-                server: PMA_commonParams.get('server'),
                 token: PMA_commonParams.get('token')
             },
             success: function (data) {
@@ -945,7 +942,6 @@ function PMA_ensureNaviSettings(selflink) {
     if (!$('#pma_navigation_settings').length) {
         var params = {
             getNaviSettings: true,
-            server: PMA_commonParams.get('server'),
             token: PMA_commonParams.get('token')
         };
         var url = $('#pma_navigation').find('a.navigation_url').attr('href');
@@ -977,7 +973,6 @@ function PMA_reloadNavigation(callback, paths) {
     var params = {
         reload: true,
         no_debug: true,
-        server: PMA_commonParams.get('server'),
         token: PMA_commonParams.get('token')
     };
     paths = paths || traverseNavigationForPaths();
@@ -1042,7 +1037,7 @@ function PMA_navigationTreePagination($this) {
     var url, params;
     if ($this[0].tagName == 'A') {
         url = $this.attr('href');
-        params = 'ajax_request=true&token=' + PMA_commonParams.get('token');
+        params = 'ajax_request=true';
     } else { // tagName == 'SELECT'
         url = 'navigation.php';
         params = $this.closest("form").serialize() + '&ajax_request=true';

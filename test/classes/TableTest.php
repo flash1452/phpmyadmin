@@ -746,6 +746,7 @@ class TableTest extends PMATestCase
     {
         $table = 'PMA_BookMark';
         $db = 'PMA';
+        Util::cacheSet('lower_case_table_names', false);
 
         $table = new Table($table, $db);
 
@@ -1203,22 +1204,22 @@ class TableTest extends PMATestCase
     }
 
     /**
-     * Test for getStorageEngine
+     * Test for getTableStorageEngine
      *
      * @return void
      */
-    public function testGetStorageEngine(){
+    public function testGetTableStorageEngine(){
         $target_table = 'table1';
         $target_db = 'pma_test';
         $tbl_object = new Table($target_db, $target_table);
-        $tbl_object->getStatusInfo(null, true);
+        $reread_info = $tbl_object->getStatusInfo(null, true);
         $extension = new PMA\libraries\dbi\DBIDummy();
         $dbi = new PMA\libraries\DatabaseInterface($extension);
         $expect = '';
         $tbl_storage_engine = $dbi->getTable(
             $target_db,
             $target_table
-        )->getStorageEngine();
+        )->getTableStorageEngine();
         $this->assertEquals(
             $expect,
             $tbl_storage_engine
@@ -1226,22 +1227,22 @@ class TableTest extends PMATestCase
     }
 
     /**
-     * Test for getComment
+     * Test for getShowComment
      *
      * @return void
      */
-    public function testGetComment(){
+    public function testGetShowComment(){
         $target_table = 'table1';
         $target_db = 'pma_test';
         $tbl_object = new Table($target_db, $target_table);
-        $tbl_object->getStatusInfo(null, true);
+        $reread_info = $tbl_object->getStatusInfo(null, true);
         $extension = new PMA\libraries\dbi\DBIDummy();
         $dbi = new PMA\libraries\DatabaseInterface($extension);
         $expect = '';
         $show_comment = $dbi->getTable(
             $target_db,
             $target_table
-        )->getComment();
+        )->getShowComment();
         $this->assertEquals(
             $expect,
             $show_comment
@@ -1249,22 +1250,22 @@ class TableTest extends PMATestCase
     }
 
      /**
-     * Test for getCollation
+     * Test for getTableCollation
      *
      * @return void
      */
-    public function testGetCollation(){
+    public function testGetTableCollation(){
         $target_table = 'table1';
         $target_db = 'pma_test';
         $tbl_object = new Table($target_db, $target_table);
-        $tbl_object->getStatusInfo(null, true);
+        $reread_info = $tbl_object->getStatusInfo(null, true);
         $extension = new PMA\libraries\dbi\DBIDummy();
         $dbi = new PMA\libraries\DatabaseInterface($extension);
         $expect = '';
         $tbl_collation = $dbi->getTable(
             $target_db,
             $target_table
-        )->getCollation();
+        )->getTableCollation();
         $this->assertEquals(
             $expect,
             $tbl_collation
@@ -1272,22 +1273,22 @@ class TableTest extends PMATestCase
     }
 
     /**
-     * Test for getRowFormat
+     * Test for getTableRowFormat
      *
      * @return void
      */
-    public function testGetRowFormat(){
+    public function testGetTableRowFormat(){
         $target_table = 'table1';
         $target_db = 'pma_test';
         $tbl_object = new Table($target_db, $target_table);
-        $tbl_object->getStatusInfo(null, true);
+        $reread_info = $tbl_object->getStatusInfo(null, true);
         $extension = new PMA\libraries\dbi\DBIDummy();
         $dbi = new PMA\libraries\DatabaseInterface($extension);
         $expect = '';
         $row_format = $dbi->getTable(
             $target_db,
             $target_table
-        )->getRowFormat();
+        )->getTableRowFormat();
         $this->assertEquals(
             $expect,
             $row_format
@@ -1295,22 +1296,22 @@ class TableTest extends PMATestCase
     }
 
     /**
-     * Test for getAutoIncrement
+     * Test for getAutoIncrementInfo
      *
      * @return void
      */
-    public function testGetAutoIncrement(){
+    public function testGetAutoIncrementInfo(){
         $target_table = 'table1';
         $target_db = 'pma_test';
         $tbl_object = new Table($target_db, $target_table);
-        $tbl_object->getStatusInfo(null, true);
+        $reread_info = $tbl_object->getStatusInfo(null, true);
         $extension = new PMA\libraries\dbi\DBIDummy();
         $dbi = new PMA\libraries\DatabaseInterface($extension);
         $expect = '';
         $auto_increment = $dbi->getTable(
             $target_db,
             $target_table
-        )->getAutoIncrement();
+        )->getAutoIncrementInfo();
         $this->assertEquals(
             $expect,
             $auto_increment
@@ -1318,22 +1319,22 @@ class TableTest extends PMATestCase
     }
 
     /**
-     * Test for getCreateOptions
+     * Test for createOptionsArray
      *
      * @return void
      */
-    public function testGetCreateOptions(){
+    public function testCreateOptionsArray(){
         $target_table = 'table1';
         $target_db = 'pma_test';
         $tbl_object = new Table($target_db, $target_table);
-        $tbl_object->getStatusInfo(null, true);
+        $reread_info = $tbl_object->getStatusInfo(null, true);
         $extension = new PMA\libraries\dbi\DBIDummy();
         $dbi = new PMA\libraries\DatabaseInterface($extension);
         $expect = array('pack_keys' => 'DEFAULT');
         $create_options = $dbi->getTable(
             $target_db,
             $target_table
-        )->getCreateOptions();
+        )->createOptionsArray();
         $this->assertEquals(
             $expect,
             $create_options

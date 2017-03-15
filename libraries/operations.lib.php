@@ -354,7 +354,10 @@ function PMA_runProcedureAndFunctionDefinitions($db)
 function PMA_createDbBeforeCopy()
 {
     // lower_case_table_names=1 `DB` becomes `db`
-    if ($GLOBALS['dbi']->getLowerCaseNames() === '1') {
+    $lowerCaseTableNames = $GLOBALS['dbi']->fetchValue(
+        'SELECT @@lower_case_table_names'
+    );
+    if ($lowerCaseTableNames === '1') {
         $_REQUEST['newname'] = mb_strtolower(
             $_REQUEST['newname']
         );
@@ -1358,7 +1361,7 @@ function PMA_getListofMaintainActionLink($pma_table, $url_params)
     $html_output = '';
 
     // analyze table
-    if ($pma_table->isEngine(array('MYISAM', 'ARIA', 'INNODB', 'BERKELEYDB', 'TOKUDB'))) {
+    if ($pma_table->isEngine(array('MYISAM', 'ARIA', 'INNODB', 'BERKELEYDB'))) {
         $params = array(
             'sql_query' => 'ANALYZE TABLE '
                 . Util::backquote($GLOBALS['table']),
@@ -1373,7 +1376,7 @@ function PMA_getListofMaintainActionLink($pma_table, $url_params)
     }
 
     // check table
-    if ($pma_table->isEngine(array('MYISAM', 'ARIA', 'INNODB', 'TOKUDB'))) {
+    if ($pma_table->isEngine(array('MYISAM', 'ARIA', 'INNODB'))) {
         $params = array(
             'sql_query' => 'CHECK TABLE '
                 . Util::backquote($GLOBALS['table']),
@@ -1433,7 +1436,7 @@ function PMA_getListofMaintainActionLink($pma_table, $url_params)
     );
 
     // optimize table
-    if ($pma_table->isEngine(array('MYISAM', 'ARIA', 'INNODB', 'BERKELEYDB', 'TOKUDB'))) {
+    if ($pma_table->isEngine(array('MYISAM', 'ARIA', 'INNODB', 'BERKELEYDB'))) {
         $params = array(
             'sql_query' => 'OPTIMIZE TABLE '
                 . Util::backquote($GLOBALS['table']),
@@ -1714,8 +1717,6 @@ function PMA_getQueryAndResultForReorderingTable()
         && $_REQUEST['order_order'] === 'desc'
     ) {
         $sql_query .= ' DESC';
-    } else {
-        $sql_query .= ' ASC';
     }
     $sql_query .= ';';
     $result = $GLOBALS['dbi']->query($sql_query);
@@ -2085,15 +2086,8 @@ function PMA_moveOrCopyTable($db, $table)
             $old = Util::backquote($db) . '.'
                 . Util::backquote($table);
             $message->addParam($old);
-
-
-            $new_name = $_REQUEST['new_name'];
-            if ($GLOBALS['dbi']->getLowerCaseNames() === '1') {
-                $new_name = strtolower($new_name);
-            }
-
             $new = Util::backquote($_REQUEST['target_db']) . '.'
-                . Util::backquote($new_name);
+                . Util::backquote($_REQUEST['new_name']);
             $message->addParam($new);
 
             /* Check: Work on new table or on old table? */

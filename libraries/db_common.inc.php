@@ -55,11 +55,9 @@ if (! isset($is_db) || ! $is_db) {
         $is_db = false;
     }
     // Not a valid db name -> back to the welcome page
-    $params = array('reload' => '1');
-    if (isset($message)) {
-        $params['message'] = $message;
-    }
-    $uri = './index.php' . URL::getCommonRaw($params);
+    $uri = './index.php'
+        . URL::getCommonRaw(array())
+        . (isset($message) ? '&message=' . urlencode($message) : '') . '&reload=1';
     if (strlen($db) === 0 || ! $is_db) {
         $response = Response::getInstance();
         if ($response->isAjax()) {

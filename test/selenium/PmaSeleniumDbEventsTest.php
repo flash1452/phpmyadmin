@@ -66,9 +66,7 @@ class PMA_SeleniumDbEventsTest extends PMA_SeleniumBase
      */
     public function tearDown()
     {
-        if ($this->_mysqli != null) {
-            $this->dbQuery("SET GLOBAL event_scheduler=\"OFF\"");
-        }
+        $this->dbQuery("SET GLOBAL event_scheduler=\"OFF\"");
         parent::tearDown();
     }
 

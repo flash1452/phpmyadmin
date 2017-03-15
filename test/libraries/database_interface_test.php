@@ -27,7 +27,6 @@ class PMA_DBI_Test extends PHPUnit_Framework_TestCase
     {
         $GLOBALS['cfg']['DBG']['sql'] = false;
         $GLOBALS['cfg']['IconvExtraParams'] = '';
-        $GLOBALS['server'] = 1;
     }
 
     /**
@@ -39,7 +38,7 @@ class PMA_DBI_Test extends PHPUnit_Framework_TestCase
      */
     function testQuery()
     {
-        $this->assertEquals(1000, $GLOBALS['dbi']->tryQuery('SELECT 1'));
+        $this->assertEquals(0, $GLOBALS['dbi']->tryQuery('SELECT 1'));
     }
 
     /**

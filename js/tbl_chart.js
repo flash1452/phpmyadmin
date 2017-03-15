@@ -46,10 +46,7 @@ function PMA_queryChart(data, columnNames, settings) {
         legend : {
             show : true,
             placement : 'outsideGrid',
-            location : 'e',
-            rendererOptions: {
-                numberColumns: 2
-            }
+            location : 'e'
         },
         axes : {
             xaxis : {

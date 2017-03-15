@@ -66,7 +66,10 @@ class AuthenticationHttp extends AuthenticationPlugin
         // remove non US-ASCII to respect RFC2616
         $realm_message = preg_replace('/[^\x20-\x7e]/i', '', $realm_message);
         $response->header('WWW-Authenticate: Basic realm="' . $realm_message . '"');
-        $response->set_http_response_code(401);
+        $response->header('HTTP/1.0 401 Unauthorized');
+        if (php_sapi_name() !== 'cgi-fcgi') {
+            $response->header('status: 401 Unauthorized');
+        }
 
         /* HTML header */
         $footer = $response->getFooter();

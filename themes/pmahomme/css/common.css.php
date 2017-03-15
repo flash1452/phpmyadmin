@@ -611,6 +611,7 @@ tr:last-child td.condition {
  */
 td.null {
     font-style: italic;
+    text-align: <?php echo $right; ?>;
     color: #7d7d7d;
 }
 
@@ -784,10 +785,6 @@ fieldset.confirmation legend {
 }
 
 /* end messageboxes */
-
-.new_central_col{
-    width: 100%;
-}
 
 .tblcomment {
     font-size: 70%;
@@ -1299,7 +1296,7 @@ div#serverstatusquerieschart {
     float: <?php echo $left; ?>;
     width: 500px;
     height: 350px;
-    margin-<?php echo $right;?>: 50px;
+    padding-<?php echo $left; ?>: 30px;
 }
 
 table#serverstatusqueriesdetails,

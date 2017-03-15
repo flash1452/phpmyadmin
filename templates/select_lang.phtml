@@ -1,3 +1,4 @@
+<?php if (count($available_languages) > 1) : ?>
     <form method="get" action="index.php" class="disableAjax">
     <?= PMA\libraries\URL::getHiddenInputs($_form_params) ?>
 
@@ -30,3 +31,6 @@
     <?php endif; ?>
 
     </form>
+<?php endif; ?>
+
+

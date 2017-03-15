@@ -35,7 +35,6 @@
     <logging>
         <log type="coverage-clover" target="build/logs/clover.xml"/>
         <log type="junit" target="build/logs/junit.xml" logIncompleteSkipped="false"/>
-        <log type="json" target="build/logs/phpunit.json" />
     </logging>
 
     <filter>
@@ -48,6 +47,8 @@
                 <directory>test/</directory>
                 <!-- examples for users -->
                 <directory suffix=".php">examples</directory>
+                <!-- maintenance scripts -->
+                <directory suffix=".php">scripts</directory>
             </exclude>
         </whitelist>
     </filter>

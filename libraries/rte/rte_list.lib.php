@@ -5,10 +5,11 @@
  *
  * @package PhpMyAdmin
  */
+use SqlParser\Statements\CreateStatement;
 use PMA\libraries\Response;
 use PMA\libraries\URL;
 use PMA\libraries\Template;
-use PhpMyAdmin\SqlParser\Statements\CreateStatement;
+
 
 if (! defined('PHPMYADMIN')) {
     exit;
@@ -253,14 +254,14 @@ function PMA_RTN_getRowForList($routine, $rowclass = '')
         $db, $routine['type'], $routine['name']
     );
     if ($definition !== false) {
-        $parser = new PhpMyAdmin\SqlParser\Parser($definition);
+        $parser = new SqlParser\Parser($definition);
 
         /**
          * @var CreateStatement $stmt
          */
         $stmt = $parser->statements[0];
 
-        $params = PhpMyAdmin\SqlParser\Utils\Routine::getParameters($stmt);
+        $params = SqlParser\Utils\Routine::getParameters($stmt);
 
         if (PMA\libraries\Util::currentUserHasPrivilege('EXECUTE', $db)) {
             $execute_action = 'execute_routine';
